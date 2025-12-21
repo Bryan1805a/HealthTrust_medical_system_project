@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Transaction } from "@mysten/sui/transactions";
 import { useSignAndExecuteTransaction, useCurrentAccount } from "@mysten/dapp-kit";
 import { PACKAGE_ID, MODULE_NAME } from "./config";
-import { uploadToPinata } from "./pinata"; // <--- Import hàm vừa viết
+import { uploadToPinata } from "./pinata";
+import { DoctorLobbyView } from "./DoctorLobbyView";
 import toast from 'react-hot-toast';
 
 export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
@@ -39,9 +40,20 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
       return;
     }
 
+    if (!PACKAGE_ID || PACKAGE_ID === "YOUR_PACKAGE_ID_HERE") {
+      toast.error("Chưa cấu hình PACKAGE_ID. Vui lòng cập nhật trong config.ts");
+      return;
+    }
+
+    // Validate địa chỉ Sui (bắt đầu bằng 0x và có độ dài hợp lệ)
+    if (!patientId.startsWith("0x") || patientId.length < 10) {
+      toast.error("Địa chỉ ví bệnh nhân không hợp lệ!");
+      return;
+    }
+
     const txb = new Transaction();
     const nameBytes = new TextEncoder().encode(medName);
-    const ipfsBytes = new TextEncoder().encode(ipfsHash); // Hash thật được mã hóa
+    const ipfsBytes = new TextEncoder().encode(ipfsHash);
 
     txb.moveCall({
       target: `${PACKAGE_ID}::${MODULE_NAME}::create_prescription`,
@@ -53,17 +65,18 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
       ],
     });
 
-    const loadingToast = toast.loading("Đang tạo đơn thuốc..."); // Hiện loading
+    const loadingToast = toast.loading("Đang tạo đơn thuốc...");
 
     signAndExecuteTransaction(
       { transaction: txb },
       {
         onSuccess: () => {
-          toast.success("Đã gửi đơn thuốc thành công!", { id: loadingToast }); // Success
+          toast.success("Đã gửi đơn thuốc thành công!", { id: loadingToast });
           setMedName("");
+          setPatientId("");
           setIpfsHash(""); 
         },
-        onError: (err) => toast.error("Lỗi: " + err.message, { id: loadingToast }), // Error
+        onError: (err) => toast.error("Lỗi: " + err.message, { id: loadingToast }),
       }
     );
   };
@@ -71,15 +84,20 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
   // Logic code giữ nguyên
 
   return (
-    <div className="glass-card" style={{ maxWidth: 500, margin: '0 auto' }}>
-      <h2 className="text-highlight" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        👨‍⚕️ Bàn làm việc Bác sĩ
-      </h2>
-      <p className="text-muted" style={{ fontSize: '0.8em', marginBottom: 20 }}>
-        ID: {doctorCapId}
-      </p>
-      
-      <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+      {/* Lobby View */}
+      <DoctorLobbyView onSelectPatient={(address) => setPatientId(address)} />
+
+      {/* Prescription Form */}
+      <div className="glass-card" style={{ maxWidth: 600, margin: '0 auto', width: '100%' }}>
+        <h2 className="text-highlight" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          👨‍⚕️ Bàn làm việc Bác sĩ
+        </h2>
+        <p className="text-muted" style={{ fontSize: '0.8em', marginBottom: 20 }}>
+          ID: {doctorCapId}
+        </p>
+        
+        <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
         
         <div>
           <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Mã ví bệnh nhân</label>
@@ -130,6 +148,7 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
         >
           ✍️ Ký & Gửi Đơn Thuốc
         </button>
+        </div>
       </div>
     </div>
   );

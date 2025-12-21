@@ -1,70 +1,146 @@
-module medical_system::core {
-    use std::string::{Self, String};
+module medical::core {
+    use sui::object::{Self, UID, ID};
+    use sui::transfer;
+    use sui::tx_context::{Self, TxContext};
+    use sui::event;
+    use std::vector;
+    use std::string::{String};
 
-    // DOCTOR CAPABILITY
-    public struct DoctorCap has key, store {
-        id: UID,
-        hospital_name: String,
+    // --- CÁC STRUCT ---
+
+    struct DoctorCap has key, store { id: UID }
+
+    // --- EVENTS ---
+    
+    struct PrescriptionCreated has copy, drop {
+        prescription_id: ID,
+        doctor_id: address,
+        patient_id: address,
+        name: String,
     }
 
-    // MEDICAL RECORD (Hồ sơ bệnh án)
-    public struct MedicalRecord has key {
+    struct RecordCreated has copy, drop {
+        record_id: ID,
+        patient_id: address,
+    }
+
+    struct PrescriptionUsed has copy, drop {
+        prescription_id: ID,
+        patient_id: address,
+    }
+
+    struct PatientRegistered has copy, drop {
+        patient_id: address,
+        lobby_id: ID,
+    }
+
+    struct MedicalRecord has key, store {
         id: UID,
         owner: address,
-        records: vector<String>, 
+        record_data: String
     }
 
-    // PRESCRIPTION (Đơn thuốc điện tử)
-    public struct Prescription has key, store {
+    struct Prescription has key, store {
         id: UID,
         name: String,
         medication_hash: String,
         doctor_id: address,
-        patient_id: address,
-        is_used: bool,
+        is_used: bool
     }
 
-    // --- FUNCTIONS ---
+    // [MỚI] Sảnh chờ - Nơi chứa danh sách bệnh nhân
+    struct Lobby has key, store {
+        id: UID,
+        patients: vector<address>
+    }
+
+    // --- KHỞI TẠO ---
+
     fun init(ctx: &mut TxContext) {
-        let admin_cap = DoctorCap {
+        // 1. Tạo thẻ bác sĩ gửi cho người deploy
+        transfer::transfer(DoctorCap { id: object::new(ctx) }, tx_context::sender(ctx));
+
+        // 2. [MỚI] Tạo Sảnh chờ và SHARE cho cộng đồng
+        transfer::share_object(Lobby {
             id: object::new(ctx),
-            hospital_name: string::utf8(b"Sui General Hospital"),
-        };
-        transfer::transfer(admin_cap, ctx.sender());
+            patients: vector::empty()
+        });
     }
 
-    // Register
-    public fun create_profile(ctx: &mut TxContext) {
+    // --- CÁC HÀM CHỨC NĂNG ---
+
+    // 1. Tạo hồ sơ
+    #[allow(lint(self_transfer))]
+    public fun create_profile(_ctx: &mut TxContext) {
+        let sender = tx_context::sender(_ctx);
         let record = MedicalRecord {
-            id: object::new(ctx),
-            owner: ctx.sender(),
-            records: vector::empty(),
+            id: object::new(_ctx),
+            owner: sender,
+            record_data: std::string::utf8(b"Ho So Benh Nhan"),
         };
-        transfer::transfer(record, ctx.sender());
+        let record_id = object::id(&record);
+        transfer::transfer(record, sender);
+        
+        // Emit event
+        event::emit(RecordCreated {
+            record_id,
+            patient_id: sender,
+        });
     }
 
-    // Issue Prescription
+    // 2. [MỚI] Bệnh nhân đăng ký khám (Thêm tên vào Lobby)
+    public fun register_for_examination(lobby: &mut Lobby, ctx: &mut TxContext) {
+        let sender = tx_context::sender(ctx);
+        // Kiểm tra xem đã có trong danh sách chưa để tránh trùng (Optional)
+        if (!vector::contains(&lobby.patients, &sender)) {
+            vector::push_back(&mut lobby.patients, sender);
+            
+            // Emit event
+            event::emit(PatientRegistered {
+                patient_id: sender,
+                lobby_id: object::id(lobby),
+            });
+        };
+    }
+
+    // 3. Kê đơn (Giữ nguyên - chỉ sửa chút tham số đầu vào cho gọn)
     public fun create_prescription(
-        _: &DoctorCap, 
+        _: &DoctorCap,
         patient_addr: address,
-        name_bytes: vector<u8>,
-        ipfs_hash_bytes: vector<u8>,
+        name: vector<u8>,
+        medication_hash: vector<u8>,
         ctx: &mut TxContext
     ) {
+        let prescription_name = std::string::utf8(name);
         let prescription = Prescription {
             id: object::new(ctx),
-            name: string::utf8(name_bytes),
-            medication_hash: string::utf8(ipfs_hash_bytes),
-            doctor_id: ctx.sender(),
-            patient_id: patient_addr,
-            is_used: false,
+            name: prescription_name,
+            medication_hash: std::string::utf8(medication_hash),
+            doctor_id: tx_context::sender(ctx),
+            is_used: false
         };
-        
+        let prescription_id = object::id(&prescription);
+        // Gửi đơn thuốc thẳng vào ví bệnh nhân
         transfer::transfer(prescription, patient_addr);
+        
+        // Emit event
+        event::emit(PrescriptionCreated {
+            prescription_id,
+            doctor_id: tx_context::sender(ctx),
+            patient_id: patient_addr,
+            name: prescription_name,
+        });
     }
 
-    // Use Prescription
-    public fun use_prescription(prescription: &mut Prescription) {
+    // 4. Mua thuốc (Giữ nguyên)
+    public fun use_prescription(prescription: &mut Prescription, ctx: &mut TxContext) {
+        let prescription_id = object::id(prescription);
         prescription.is_used = true;
+        
+        // Emit event
+        event::emit(PrescriptionUsed {
+            prescription_id,
+            patient_id: tx_context::sender(ctx),
+        });
     }
 }

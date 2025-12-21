@@ -1,107 +1,422 @@
 /* src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ============================================
+   CSS VARIABLES - MÀU SẮC VÀ THEME
+   ============================================ */
+:root {
+  /* Màu chính - Tone xanh tối hiện đại */
+  --primary-color: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #60a5fa;
+  --primary-glow: rgba(59, 130, 246, 0.3);
+  
+  /* Màu nền - Xanh tối gradient */
+  --bg-dark: #0a0f1e;
+  --bg-darker: #050812;
+  --bg-overlay: rgba(10, 15, 30, 0.85);
+  --bg-overlay-dark: rgba(5, 8, 18, 0.95);
+  
+  /* Glass morphism */
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-bg-hover: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(59, 130, 246, 0.2);
+  --glass-border-hover: rgba(59, 130, 246, 0.4);
+  
+  /* Text colors */
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-light: #cbd5e1;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+}
+
+/* ============================================
+   RESET & BASE STYLES
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
 
 #root {
-  background-color: transparent !important; /* Quan trọng: Không cho nó có màu nền */
+  background-color: transparent !important;
   width: 100%;
-  min-height: 100vh; /* Để nó cao bằng body */
-  display: flex;     /* Giữ layout không bị vỡ */
+  min-height: 100vh;
+  display: flex;
   flex-direction: column;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text-main);
   min-height: 100vh;
+  overflow-x: hidden;
   
-  /* --- PHẦN QUAN TRỌNG NHẤT: BACKGROUND --- */
-  /* Lớp 1: Màu phủ tối (để chữ luôn đọc được) */
-  /* Lớp 2: Ảnh nền Y tế công nghệ cao */
+  /* Background với tone xanh tối hiện đại */
   background: 
-    linear-gradient(to bottom, rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.95)),
+    /* Lớp overlay gradient xanh tối */
+    linear-gradient(135deg, var(--bg-overlay-dark) 0%, var(--bg-overlay) 50%, rgba(15, 23, 42, 0.9) 100%),
+    /* Lớp overlay xanh tối phủ lên */
+    linear-gradient(to bottom, rgba(5, 8, 18, 0.7), rgba(10, 15, 30, 0.8)),
+    /* Ảnh nền */
     url('./assets/medical_background.jpg');
   
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* Cố định ảnh khi cuộn chuột -> Rất xịn */
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  
+  /* Tối ưu hiển thị */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- HIỆU ỨNG KÍNH MỜ (GIỐNG MẪU CỦA BẠN) --- */
+/* ============================================
+   GLASS MORPHISM CARDS - Hiệu ứng kính mờ hiện đại
+   ============================================ */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px); /* Độ mờ hậu cảnh */
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Bóng đổ sâu */
-  border-radius: 16px;
-  padding: 24px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-md);
+  border-radius: 20px;
+  padding: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hiệu ứng ánh sáng viền khi hover */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--primary-color) 50%, 
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-  border-color: rgba(59, 130, 246, 0.3); /* Viền sáng lên màu xanh khi hover */
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border-color: var(--glass-border-hover);
+  background: var(--glass-bg-hover);
 }
 
-/* --- CÁC NÚT BẤM (BUTTONS) --- */
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   BUTTONS - Nút bấm hiện đại với gradient
+   ============================================ */
 .btn-primary {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); /* Bóng nút màu xanh */
+  box-shadow: var(--shadow-sm), 0 0 0 0 var(--primary-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  transform: scale(1.02);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); /* Phát sáng mạnh */
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.btn-primary:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
 }
 
 .btn-primary:disabled {
-  background: #334155;
-  color: #64748b;
+  background: rgba(51, 65, 85, 0.5);
+  color: var(--text-muted);
   cursor: not-allowed;
   box-shadow: none;
+  opacity: 0.6;
 }
 
-/* --- INPUT --- */
+/* ============================================
+   INPUT FIELDS - Ô nhập liệu với glass effect
+   ============================================ */
 .input-glass {
-  background: rgba(0, 0, 0, 0.3); /* Nền input tối hơn card */
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
+  color: var(--text-main);
+  padding: 14px 16px;
+  border-radius: 12px;
   width: 100%;
-  box-sizing: border-box;
-  outline: none;
   font-family: 'Inter', sans-serif;
-  transition: border-color 0.2s;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-glass::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 
 .input-glass:focus {
   border-color: var(--primary-color);
-  background: rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 0 3px var(--primary-glow), var(--shadow-sm);
+  transform: translateY(-1px);
 }
 
-/* --- TYPOGRAPHY --- */
-h1, h2, h3 { 
-  margin-top: 0; 
-  font-weight: 700; 
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Bóng chữ nhẹ */
+.input-glass:hover:not(:focus) {
+  border-color: var(--glass-border-hover);
+  background: rgba(0, 0, 0, 0.5);
 }
-.text-highlight { color: var(--primary-color); }
-.text-muted { color: var(--text-muted); font-size: 0.9em; }
-a { color: #60a5fa; text-decoration: none; transition: color 0.2s; }
-a:hover { color: #93c5fd; text-decoration: underline; }
+
+/* ============================================
+   TYPOGRAPHY - Kiểu chữ rõ ràng và hiện đại
+   ============================================ */
+h1 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.3px;
+  line-height: 1.4;
+}
+
+p {
+  margin: 0 0 12px 0;
+  line-height: 1.6;
+  color: var(--text-light);
+}
+
+.text-highlight { 
+  color: var(--primary-light);
+  font-weight: 600;
+}
+
+.text-muted { 
+  color: var(--text-muted); 
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+a { 
+  color: var(--primary-light); 
+  text-decoration: none; 
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+a:hover { 
+  color: var(--primary-color);
+  text-decoration: underline;
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* ============================================
+   TAB BUTTONS - Nút chuyển tab
+   ============================================ */
+.tab-button {
+  padding: 12px 28px;
+  cursor: pointer;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.tab-button:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+  border: none;
+  color: white;
+  box-shadow: var(--shadow-sm), 0 0 0 0 var(--primary-glow);
+}
+
+.tab-button.active:hover {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+/* ============================================
+   UTILITY CLASSES - Các class tiện ích
+   ============================================ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+
+.mt-sm { margin-top: 8px; }
+.mt-md { margin-top: 16px; }
+.mt-lg { margin-top: 24px; }
+.mb-sm { margin-bottom: 8px; }
+.mb-md { margin-bottom: 16px; }
+.mb-lg { margin-bottom: 24px; }
+
+/* ============================================
+   ANIMATIONS - Hiệu ứng chuyển động mượt mà
+   ============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================
+   SCROLLBAR - Thanh cuộn đẹp hơn
+   ============================================ */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+  background-clip: padding-box;
+}

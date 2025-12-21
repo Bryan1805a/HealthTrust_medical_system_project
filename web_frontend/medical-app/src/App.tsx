@@ -4,9 +4,12 @@ import { CreateProfile } from "./CreateProfile";
 import { PatientProfile } from "./PatientProfile";
 import { DoctorDashboard } from "./DoctorDashboard";
 import { PrescriptionList } from "./PrescriptionList";
+import { StatisticsDashboard } from "./StatisticsDashboard";
+import { TransactionHistory } from "./TransactionHistory";
+import { FindContractIds } from "./FindContractIds";
 import { PACKAGE_ID, MODULE_NAME } from "./config";
-import { Toaster } from 'react-hot-toast'; // <--- MỚI: Thư viện thông báo
-import { LayoutDashboard, User, Stethoscope, Activity } from "lucide-react"; // <--- MỚI: Icon
+import { Toaster } from 'react-hot-toast';
+import { LayoutDashboard, User, Stethoscope, Activity } from "lucide-react";
 import "./index.css"
 
 function App() {
@@ -42,51 +45,79 @@ function App() {
   }, [doctorCap]);
 
   return (
-    <div style={{ padding: 20, maxWidth: 1000, margin: "0 auto", paddingBottom: 100 }}>
+    <div className="container" style={{ paddingTop: 30, paddingBottom: 100 }}>
       {/* 1. CẤU HÌNH TOASTER (Thông báo bay ra ở góc trên phải) */}
       <Toaster 
         position="top-right"
         toastOptions={{
           style: {
-            background: '#1e293b',
+            background: 'rgba(15, 23, 42, 0.95)',
             color: '#fff',
-            border: '1px solid rgba(255,255,255,0.1)'
+            border: '1px solid var(--glass-border)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '12px',
+            boxShadow: 'var(--shadow-lg)'
           },
         }}
       />
 
-      {/* HEADER */}
-      <nav 
-        className="glass-card" // Thêm class này để nó mờ mờ ảo ảo
-        style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
-          marginBottom: 40,
-          borderRadius: 12, // Bo tròn nhẹ
-          background: 'rgba(0, 0, 0, 0.4)' // Đậm hơn nền thường một chút để nổi bật
-        }}
-      >
-        <h1 className="text-highlight" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '1.5em', margin: 0 }}>
-          <Activity color="#3b82f6" size={28} /> SUI Medical
+      {/* HEADER - Navigation bar */}
+      <nav className="glass-card" style={{ 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        marginBottom: 40,
+        padding: "20px 28px"
+      }}>
+        <h1 className="text-highlight" style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 12, 
+          fontSize: '1.75rem', 
+          margin: 0,
+          fontWeight: 700
+        }}>
+          <Activity color="#3b82f6" size={32} /> 
+          <span>SUI Medical</span>
         </h1>
         <ConnectButton />
       </nav>
 
-      <div style={{ marginTop: 20 }}>
+      <div>
         {!account ? (
-          <div className="glass-card" style={{ textAlign: "center", padding: 50 }}>
-            <h2>👋 Chào mừng đến với hệ thống Y tế Web3</h2>
-            <p className="text-muted">Vui lòng kết nối ví để tiếp tục</p>
+          <div className="glass-card fade-in" style={{ 
+            textAlign: "center", 
+            padding: "60px 40px",
+            maxWidth: 600,
+            margin: "0 auto"
+          }}>
+            <h2 style={{ marginBottom: 16 }}>👋 Chào mừng đến với hệ thống Y tế Web3</h2>
+            <p className="text-muted" style={{ fontSize: '1.1em', marginBottom: 0 }}>
+              Vui lòng kết nối ví Sui để tiếp tục
+            </p>
+          </div>
+        ) : PACKAGE_ID === "YOUR_PACKAGE_ID_HERE" ? (
+          <div className="fade-in">
+            <div className="glass-card" style={{ maxWidth: 800, margin: '0 auto', marginBottom: 30 }}>
+              <h2 style={{ marginBottom: 16, color: '#f59e0b' }}>⚠️ Cần cấu hình Contract IDs</h2>
+              <p className="text-muted" style={{ marginBottom: 20 }}>
+                Bạn đã publish contract thành công! Bây giờ cần cập nhật PACKAGE_ID và LOBBY_ID trong config.ts
+              </p>
+              <FindContractIds />
+            </div>
           </div>
         ) : (
-          <div>
-            {/* 2. MENU TAB CHUYỂN ĐỔI */}
-            <div style={{ display: 'flex', gap: 15, marginBottom: 25 }}>
+          <div className="fade-in">
+            {/* 2. MENU TAB CHUYỂN ĐỔI - Tab navigation */}
+            <div style={{ 
+              display: 'flex', 
+              gap: 12, 
+              marginBottom: 30,
+              flexWrap: 'wrap'
+            }}>
               <button 
                 onClick={() => setActiveTab('patient')}
-                className={activeTab === 'patient' ? 'btn-primary' : 'glass-card'}
-                style={{ padding: '10px 25px', cursor: 'pointer', border: activeTab === 'patient' ? 'none' : '1px solid rgba(255,255,255,0.1)' }}
+                className={`tab-button ${activeTab === 'patient' ? 'active' : ''}`}
               >
                 <User size={18} /> Cổng Bệnh Nhân
               </button>
@@ -95,8 +126,7 @@ function App() {
               {doctorCap && (
                  <button 
                    onClick={() => setActiveTab('doctor')}
-                   className={activeTab === 'doctor' ? 'btn-primary' : 'glass-card'}
-                   style={{ padding: '10px 25px', cursor: 'pointer', border: activeTab === 'doctor' ? 'none' : '1px solid rgba(255,255,255,0.1)' }}
+                   className={`tab-button ${activeTab === 'doctor' ? 'active' : ''}`}
                  >
                    <Stethoscope size={18} /> Cổng Bác Sĩ
                  </button>
@@ -104,16 +134,35 @@ function App() {
             </div>
 
             {/* 3. NỘI DUNG CHÍNH (Thay đổi theo Tab) */}
-            <div className="glass-card" style={{ minHeight: 500, padding: 30 }}>
+            <div className="glass-card" style={{ minHeight: 500, padding: 40 }}>
               
               {/* === TAB BỆNH NHÂN === */}
               {activeTab === 'patient' && (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
+                <div className="fade-in">
                   {patientRecord ? (
                     <>
+                      <StatisticsDashboard />
+                      <div style={{ 
+                        margin: "40px 0", 
+                        height: 1, 
+                        background: 'linear-gradient(90deg, transparent, var(--glass-border) 50%, transparent)',
+                        border: 'none'
+                      }}></div>
                       <PatientProfile />
-                      <div style={{ margin: "30px 0", height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
-                      <PrescriptionList /> 
+                      <div style={{ 
+                        margin: "40px 0", 
+                        height: 1, 
+                        background: 'linear-gradient(90deg, transparent, var(--glass-border) 50%, transparent)',
+                        border: 'none'
+                      }}></div>
+                      <PrescriptionList />
+                      <div style={{ 
+                        margin: "40px 0", 
+                        height: 1, 
+                        background: 'linear-gradient(90deg, transparent, var(--glass-border) 50%, transparent)',
+                        border: 'none'
+                      }}></div>
+                      <TransactionHistory />
                     </>
                   ) : (
                     <CreateProfile onCreated={() => setTimeout(refetchPatient, 1000)} />
@@ -123,7 +172,7 @@ function App() {
 
               {/* === TAB BÁC SĨ === */}
               {activeTab === 'doctor' && doctorCap && (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
+                <div className="fade-in">
                   <DoctorDashboard doctorCapId={doctorCap.data?.objectId!} />
                 </div>
               )}
@@ -131,11 +180,6 @@ function App() {
           </div>
         )}
       </div>
-      
-      {/* CSS Animation nhỏ cho mượt */}
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      `}</style>
     </div>
   );
 }

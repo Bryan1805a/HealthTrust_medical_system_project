@@ -1,20 +1,20 @@
 module medical_system::core {
     use std::string::{Self, String};
 
-    // 1. DOCTOR CAPABILITY
+    // DOCTOR CAPABILITY
     public struct DoctorCap has key, store {
         id: UID,
         hospital_name: String,
     }
 
-    // 2. MEDICAL RECORD (Hồ sơ bệnh án)
+    // MEDICAL RECORD (Hồ sơ bệnh án)
     public struct MedicalRecord has key {
         id: UID,
         owner: address,
         records: vector<String>, 
     }
 
-    // 3. PRESCRIPTION (Đơn thuốc điện tử)
+    // PRESCRIPTION (Đơn thuốc điện tử)
     public struct Prescription has key, store {
         id: UID,
         name: String,
@@ -24,7 +24,7 @@ module medical_system::core {
         is_used: bool,
     }
 
-    // --- CÁC HÀM (FUNCTIONS) ---
+    // --- FUNCTIONS ---
     fun init(ctx: &mut TxContext) {
         let admin_cap = DoctorCap {
             id: object::new(ctx),

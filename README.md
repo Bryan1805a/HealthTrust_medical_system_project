@@ -72,14 +72,14 @@ Follow these steps to run the project on your machine.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/YOUR_USERNAME/SUI_medical_system_project.git](https://github.com/YOUR_USERNAME/SUI_medical_system_project.git)
+git clone [https://github.com/Bryan1805a/SUI_medical_system_project.git](https://github.com/Bryan1805a/SUI_medical_system_project.git)
 cd SUI_medical_system_project
 ```
 
 ### 2. Install Frontend Dependencies
 Navigate to the frontend folder (e.g., web_frontend or client): 
 ```bash
-cd web_frontend
+cd web_frontend\medical-app
 npm install
 ```
 
@@ -106,7 +106,7 @@ Open http://localhost:5173 in your browser.
 If you want to deploy your own version of the contract:
 ### 1. Navigate to the Move folder:
 ```bash
-cd medical_system
+cd sui_contracts\medical_system
 ```
 
 ### 2. Publish to Testnet:

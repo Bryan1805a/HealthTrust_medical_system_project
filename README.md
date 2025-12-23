@@ -72,7 +72,7 @@ Follow these steps to run the project on your machine.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/Bryan1805a/SUI_medical_system_project.git](https://github.com/Bryan1805a/SUI_medical_system_project.git)
+git clone https://github.com/Bryan1805a/SUI_medical_system_project.git
 cd SUI_medical_system_project
 ```
 

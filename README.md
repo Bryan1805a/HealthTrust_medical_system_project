@@ -17,7 +17,7 @@
 
 ## 🌟 Introduction
 
-**Sui Medical System** is a Web3 application designed to solve the lack of transparency and data synchronization in traditional healthcare. By leveraging the **Sui Blockchain**, we ensure that:
+**HealthTrust Medical System** is a Web3 application designed to solve the lack of transparency and data synchronization in traditional healthcare. By leveraging the **Sui Blockchain**, we ensure that:
 * **Medical Records** are owned by patients, not hospitals.
 * **Prescriptions** are immutable and verifiable.
 * **Doctors** are verified via on-chain governance (NFT Capabilities).

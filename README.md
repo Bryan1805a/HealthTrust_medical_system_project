@@ -1,4 +1,4 @@
-# 🏥 Sui Medical System MVP
+# 🏥 HealthTrust Medical System MVP
 
 ![Sui](https://img.shields.io/badge/Blockchain-SUI-blue?style=for-the-badge&logo=sui)
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react)

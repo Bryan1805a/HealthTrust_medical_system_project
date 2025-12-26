@@ -13,7 +13,7 @@ export function PatientProfile() {
   const [department, setDepartment] = useState("");
   const [priority, setPriority] = useState<number>(1);
 
-  // 1. Tự động tìm object MedicalRecord trong ví user
+  // 1. Auto-find MedicalRecord object in the user's wallet
   const { data, isLoading, error, refetch } = useSuiClientQuery(
     "getOwnedObjects",
     {
@@ -30,25 +30,25 @@ export function PatientProfile() {
     }
   );
 
-  // Hàm đăng ký khám
+  // Function to register for examination
   const registerForExamination = () => {
     if (!account || !LOBBY_ID) {
-      toast.error("Chưa cấu hình LOBBY_ID. Vui lòng cập nhật trong config.ts");
+      toast.error("LOBBY_ID not configured. Please update in config.ts");
       return;
     }
 
     if (!symptoms.trim() || !department.trim()) {
-      toast.error("Vui lòng nhập triệu chứng và chuyên khoa trước khi đăng ký khám!");
+      toast.error("Please enter symptoms and department before registering!");
       return;
     }
 
     if (priority < 1 || priority > 5) {
-      toast.error("Mức độ ưu tiên phải từ 1 đến 5.");
+      toast.error("Priority must be between 1 and 5.");
       return;
     }
 
     setIsRegistering(true);
-    const loadingToast = toast.loading("Đang đăng ký khám...");
+    const loadingToast = toast.loading("Registering for examination...");
 
     const txb = new Transaction();
     const symptomsBytes = new TextEncoder().encode(symptoms);
@@ -68,11 +68,11 @@ export function PatientProfile() {
       { transaction: txb },
       {
         onSuccess: () => {
-          toast.success("Đã đăng ký khám thành công!", { id: loadingToast });
+          toast.success("Registered for examination successfully!", { id: loadingToast });
           setIsRegistering(false);
         },
         onError: (err) => {
-          toast.error("Lỗi: " + err.message, { id: loadingToast });
+          toast.error("Error: " + err.message, { id: loadingToast });
           setIsRegistering(false);
         },
       }
@@ -80,38 +80,38 @@ export function PatientProfile() {
   };
 
   if (!account) return null;
-  if (isLoading) return <div className="text-muted">Đang tải hồ sơ...</div>;
-  if (error) return <div className="text-muted">Lỗi: {error.message}</div>;
+  if (isLoading) return <div className="text-muted">Loading records...</div>;
+  if (error) return <div className="text-muted">Error: {error.message}</div>;
 
-  // 2. Kiểm tra xem có tìm thấy cái nào không
+  // 2. Check if any record was found
   if (!data || data.data.length === 0) {
-    return <div className="text-muted">Chưa tìm thấy hồ sơ nào.</div>;
+    return <div className="text-muted">No records found.</div>;
   }
 
-  // Lấy object đầu tiên tìm được
+  // Take the first found object
   const record = data.data[0];
   const recordId = record.data?.objectId;
   const recordFields: any = (record.data as any)?.content?.fields ?? {};
-  const recordData = recordFields.record_data || "Chưa có dữ liệu";
+  const recordData = recordFields.record_data || "No data";
 
   return (
     <div className="glass-card fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 className="text-highlight" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Calendar size={24} /> Hồ sơ bệnh nhân
+          <Calendar size={24} /> Patient Profile
         </h2>
         <button 
           className="btn-primary" 
           onClick={() => refetch()}
           style={{ padding: '8px 16px', fontSize: '14px' }}
         >
-          <RefreshCw size={16} /> Cập nhật
+          <RefreshCw size={16} /> Refresh
         </button>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <p className="text-muted" style={{ marginBottom: 5, fontSize: '0.9em' }}>Mã hồ sơ (ID)</p>
+          <p className="text-muted" style={{ marginBottom: 5, fontSize: '0.9em' }}>Record ID</p>
           <p style={{ 
             fontFamily: 'monospace', 
             background: 'rgba(0, 0, 0, 0.3)', 
@@ -125,7 +125,7 @@ export function PatientProfile() {
         </div>
 
         <div>
-          <p className="text-muted" style={{ marginBottom: 5, fontSize: '0.9em' }}>Chủ sở hữu</p>
+          <p className="text-muted" style={{ marginBottom: 5, fontSize: '0.9em' }}>Owner</p>
           <p style={{ fontFamily: 'monospace', fontSize: '0.9em' }}>
             {account.address.slice(0, 10)}...{account.address.slice(-8)}
           </p>
@@ -133,7 +133,7 @@ export function PatientProfile() {
 
         <div>
           <p className="text-muted" style={{ marginBottom: 5, fontSize: "0.9em" }}>
-            Dữ liệu hồ sơ
+            Record data
           </p>
           <div
             style={{
@@ -147,7 +147,7 @@ export function PatientProfile() {
           </div>
         </div>
 
-        {/* Form đăng ký khám */}
+        {/* Registration form */}
         {LOBBY_ID && (
           <div
             style={{
@@ -163,7 +163,7 @@ export function PatientProfile() {
             }}
           >
             <p className="text-muted" style={{ fontSize: "0.85em", marginBottom: 4 }}>
-              📋 Đăng ký khám tại sảnh chờ
+              📋 Register for examination at the lobby
             </p>
 
             <div>
@@ -171,11 +171,11 @@ export function PatientProfile() {
                 className="text-muted"
                 style={{ display: "block", marginBottom: 4, fontSize: "0.85em" }}
               >
-                Triệu chứng
+                Symptoms
               </label>
               <textarea
                 className="input-glass"
-                placeholder="VD: Sốt, ho, đau đầu..."
+                placeholder="e.g., Fever, cough, headache..."
                 rows={2}
                 value={symptoms}
                 onChange={(e) => setSymptoms(e.target.value)}
@@ -187,11 +187,11 @@ export function PatientProfile() {
                 className="text-muted"
                 style={{ display: "block", marginBottom: 4, fontSize: "0.85em" }}
               >
-                Chuyên khoa
+                Department
               </label>
               <input
                 className="input-glass"
-                placeholder="VD: Nội tổng quát, Nhi, Tim mạch..."
+                placeholder="e.g., General medicine, Pediatrics, Cardiology..."
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
               />
@@ -202,7 +202,7 @@ export function PatientProfile() {
                 className="text-muted"
                 style={{ display: "block", marginBottom: 4, fontSize: "0.85em" }}
               >
-                Mức độ ưu tiên (1 = thấp, 5 = khẩn cấp)
+                Priority (1 = low, 5 = urgent)
               </label>
               <input
                 className="input-glass"
@@ -221,7 +221,7 @@ export function PatientProfile() {
               disabled={isRegistering}
               style={{ marginTop: 4, width: "100%" }}
             >
-              {isRegistering ? "⏳ Đang đăng ký..." : "📋 Đăng ký khám"}
+              {isRegistering ? "⏳ Registering..." : "📋 Register for examination"}
             </button>
           </div>
         )}

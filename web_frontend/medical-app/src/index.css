@@ -2,16 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* ============================================
-   CSS VARIABLES - MÀU SẮC VÀ THEME
+   CSS VARIABLES - COLORS & THEME
    ============================================ */
 :root {
-  /* Màu chính - Tone xanh tối hiện đại */
+  /* Primary color - modern dark blue tone */
   --primary-color: #3b82f6;
   --primary-dark: #2563eb;
   --primary-light: #ffffff;
   --primary-glow: rgba(59, 130, 246, 0.3);
   
-  /* Màu nền - Xanh tối gradient */
+  /* Background - dark blue gradient */
   --bg-dark: #0a0f1e;
   --bg-darker: #050812;
   --bg-overlay: rgba(10, 15, 30, 0.6);
@@ -58,13 +58,13 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   
-  /* Background với tone xanh tối hiện đại */
+  /* Background with modern dark blue tone */
   background: 
-    /* Lớp overlay gradient xanh tối */
+    /* Dark blue gradient overlay layer */
     linear-gradient(135deg, var(--bg-overlay-dark) 0%, var(--bg-overlay) 50%, rgba(15, 23, 42, 0.9) 100%),
-    /* Lớp overlay xanh tối phủ lên */
+    /* Dark overlay layer */
     linear-gradient(to bottom, rgba(5, 8, 18, 0.7), rgba(0, 0, 0, 0.6)),
-    /* Ảnh nền */
+    /* Background image */
     url('./assets/medical_background.jpg');
   
   background-size: cover;
@@ -72,13 +72,13 @@ body {
   background-attachment: fixed;
   background-repeat: no-repeat;
   
-  /* Tối ưu hiển thị */
+  /* Display optimizations */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ============================================
-   GLASS MORPHISM CARDS - Hiệu ứng kính mờ hiện đại
+   GLASS MORPHISM CARDS - Modern glass blur effect
    ============================================ */
 .glass-card {
   background: var(--glass-bg);
@@ -93,7 +93,7 @@ body {
   overflow: hidden;
 }
 
-/* Hiệu ứng ánh sáng viền khi hover */
+/* Edge glow effect on hover */
 .glass-card::before {
   content: '';
   position: absolute;
@@ -122,7 +122,7 @@ body {
 }
 
 /* ============================================
-   BUTTONS - Nút bấm hiện đại với gradient
+   BUTTONS - Modern gradient buttons
    ============================================ */
 .btn-primary {
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
@@ -180,7 +180,7 @@ body {
 }
 
 /* ============================================
-   INPUT FIELDS - Ô nhập liệu với glass effect
+   INPUT FIELDS - Glass effect input fields
    ============================================ */
 .input-glass {
   background: rgba(0, 0, 0, 0.4);
@@ -215,7 +215,7 @@ body {
 }
 
 /* ============================================
-   TYPOGRAPHY - Kiểu chữ rõ ràng và hiện đại
+   TYPOGRAPHY - Clear modern typography
    ============================================ */
 h1 {
   margin-top: 0;
@@ -277,7 +277,7 @@ a:hover {
 }
 
 /* ============================================
-   TAB BUTTONS - Nút chuyển tab
+   TAB BUTTONS - Tab switching buttons
    ============================================ */
 .tab-button {
   padding: 12px 28px;
@@ -315,7 +315,7 @@ a:hover {
 }
 
 /* ============================================
-   UTILITY CLASSES - Các class tiện ích
+   UTILITY CLASSES - Utility helper classes
    ============================================ */
 .container {
   max-width: 1200px;
@@ -343,7 +343,7 @@ a:hover {
 .mb-lg { margin-bottom: 24px; }
 
 /* ============================================
-   ANIMATIONS - Hiệu ứng chuyển động mượt mà
+   ANIMATIONS - Smooth animations
    ============================================ */
 @keyframes fadeIn {
   from {
@@ -398,7 +398,7 @@ a:hover {
 }
 
 /* ============================================
-   SCROLLBAR - Thanh cuộn đẹp hơn
+   SCROLLBAR - Styled scrollbar
    ============================================ */
 ::-webkit-scrollbar {
   width: 10px;
@@ -426,7 +426,7 @@ a:hover {
   background: transparent !important;
 }
 
-/* Đảm bảo chiều cao full màn hình để không bị lẹm */
+/* Ensure full screen height to avoid layout issues */
 html, body, #root, .radix-themes {
   height: 100%;
 }

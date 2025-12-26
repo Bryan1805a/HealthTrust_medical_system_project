@@ -4,14 +4,14 @@ import { Copy, CheckCircle, Search } from "lucide-react";
 import toast from 'react-hot-toast';
 
 /**
- * Component helper để tìm PACKAGE_ID và LOBBY_ID sau khi publish contract
- * Component này sẽ tự động query từ blockchain để tìm các IDs
+ * Helper component to find PACKAGE_ID and LOBBY_ID after publishing the contract
+ * This component automatically queries the blockchain to find the IDs
  */
 export function FindContractIds() {
   const account = useCurrentAccount();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Query tất cả objects của user để tìm DoctorCap và Lobby
+  // Query all user objects to find DoctorCap and Lobby
   const { data: ownedObjects } = useSuiClientQuery(
     "getOwnedObjects",
     {
@@ -27,28 +27,28 @@ export function FindContractIds() {
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(text);
-    toast.success(`Đã copy ${label}!`);
+    toast.success(`${label} copied!`);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Tìm DoctorCap để extract PACKAGE_ID từ type
+  // Find DoctorCap to extract PACKAGE_ID from type
   const doctorCap = ownedObjects?.data?.find((obj: any) => 
     obj.data?.type?.includes("DoctorCap")
   );
 
-  // Tìm Lobby object
+  // Find Lobby object
   const lobby = ownedObjects?.data?.find((obj: any) => 
     obj.data?.type?.includes("Lobby")
   );
 
-  // Extract PACKAGE_ID từ DoctorCap type (format: 0x...::core::DoctorCap)
+  // Extract PACKAGE_ID from DoctorCap type (format: 0x...::core::DoctorCap)
   const packageId = doctorCap?.data?.type?.split("::")[0] || null;
   const lobbyId = lobby?.data?.objectId || null;
 
   if (!account) {
     return (
       <div className="glass-card fade-in">
-        <p className="text-muted">Vui lòng kết nối ví để tìm contract IDs</p>
+        <p className="text-muted">Please connect your wallet to find contract IDs</p>
       </div>
     );
   }
@@ -56,7 +56,7 @@ export function FindContractIds() {
   return (
     <div className="glass-card fade-in" style={{ marginBottom: 30 }}>
       <h3 className="text-highlight" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Search size={20} /> Tìm Contract IDs
+        <Search size={20} /> Find Contract IDs
       </h3>
 
       {packageId ? (
@@ -99,13 +99,13 @@ export function FindContractIds() {
             </button>
           </div>
           <p className="text-muted" style={{ fontSize: '0.85em', marginTop: 8, marginLeft: 4 }}>
-            Copy ID này và paste vào <code>config.ts</code> → <code>PACKAGE_ID</code>
+            Copy this ID and paste into <code>config.ts</code> → <code>PACKAGE_ID</code>
           </p>
         </div>
       ) : (
         <div style={{ marginBottom: 20, padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
           <p style={{ margin: 0, color: '#ef4444' }}>
-            ⚠️ Chưa tìm thấy PACKAGE_ID. Đảm bảo bạn đã deploy contract và có DoctorCap trong ví.
+            ⚠️ PACKAGE_ID not found. Ensure you have deployed the contract and have a DoctorCap in your wallet.
           </p>
         </div>
       )}
@@ -150,24 +150,24 @@ export function FindContractIds() {
             </button>
           </div>
           <p className="text-muted" style={{ fontSize: '0.85em', marginTop: 8, marginLeft: 4 }}>
-            Copy ID này và paste vào <code>config.ts</code> → <code>LOBBY_ID</code>
+            Copy this ID and paste into <code>config.ts</code> → <code>LOBBY_ID</code>
           </p>
         </div>
       ) : (
         <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
           <p style={{ margin: 0, color: '#ef4444' }}>
-            ⚠️ Chưa tìm thấy LOBBY_ID. Lobby là shared object, có thể cần query từ transaction publish.
+            ⚠️ LOBBY_ID not found. Lobby is a shared object; you may need to check the publish transaction output.
           </p>
           <p className="text-muted" style={{ marginTop: 8, fontSize: '0.9em' }}>
-            💡 Tip: Kiểm tra output của lệnh <code>sui client publish</code> để tìm Lobby ID trong phần "Created Objects"
+            💡 Tip: Check the output of <code>sui client publish</code> to find the Lobby ID in the "Created Objects" section
           </p>
-        </div>
+        </div> 
       )}
 
       {packageId && lobbyId && (
         <div style={{ marginTop: 24, padding: '16px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
           <p style={{ margin: 0, color: '#10b981', fontWeight: 600 }}>
-            ✅ Đã tìm thấy cả hai IDs! Copy và paste vào config.ts
+            ✅ Both IDs found! Copy and paste into config.ts
           </p>
         </div>
       )}

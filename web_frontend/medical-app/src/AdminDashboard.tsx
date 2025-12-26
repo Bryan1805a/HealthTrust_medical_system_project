@@ -10,38 +10,38 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [doctorName, setDoctorName] = useState(""); // State mới lưu tên bác sĩ
+  const [doctorName, setDoctorName] = useState(""); // State: store doctor name
   const [isMinting, setIsMinting] = useState(false);
 
   const mintDoctorCap = () => {
-    // 1. Validate dữ liệu đầu vào
+    // 1. Validate input data
     if (!account || !recipientAddress || !doctorName) {
-      toast.error("Vui lòng nhập đầy đủ Tên và Địa chỉ ví!");
+      toast.error("Please enter both Name and Wallet Address!");
       return;
     }
 
     if (!recipientAddress.startsWith("0x") || recipientAddress.length < 10) {
-      toast.error("Địa chỉ ví không hợp lệ!");
+      toast.error("Invalid wallet address!");
       return;
     }
 
     if (!PACKAGE_ID || PACKAGE_ID === "YOUR_PACKAGE_ID_HERE") {
-      toast.error("Chưa cấu hình PACKAGE_ID trong config.ts");
+      toast.error("PACKAGE_ID not configured in config.ts");
       return;
     }
 
     setIsMinting(true);
-    const loadingToast = toast.loading("Đang tạo thẻ bác sĩ...");
+    const loadingToast = toast.loading("Creating doctor cap...");
 
     const txb = new Transaction();
 
-    // 2. Cập nhật Move Call với 3 tham số: AdminCap, Recipient, Name
+    // 2. Update Move Call with 3 args: AdminCap, Recipient, Name
     txb.moveCall({
       target: `${PACKAGE_ID}::${MODULE_NAME}::mint_doctor_cap`,
       arguments: [
         txb.object(adminCapId),             // Arg 1: AdminCap
-        txb.pure.address(recipientAddress), // Arg 2: Ví người nhận
-        txb.pure.string(doctorName),        // Arg 3: Tên bác sĩ (Mới thêm)
+        txb.pure.address(recipientAddress), // Arg 2: Recipient wallet
+        txb.pure.string(doctorName),        // Arg 3: Doctor name (new)
       ],
     });
 
@@ -49,14 +49,14 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
       { transaction: txb },
       {
         onSuccess: (result) => {
-          toast.success(`Đã cấp bằng cho BS. ${doctorName} thành công!`, { id: loadingToast });
+          toast.success(`Doctor ${doctorName} granted successfully!`, { id: loadingToast });
           setRecipientAddress("");
           setDoctorName(""); // Reset form
           setIsMinting(false);
           console.log("Transaction Digest:", result.digest);
         },
         onError: (err) => {
-          toast.error("Lỗi: " + err.message, { id: loadingToast });
+          toast.error("Error: " + err.message, { id: loadingToast });
           setIsMinting(false);
         },
       }
@@ -68,15 +68,15 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <Shield size={28} color="var(--primary-color)" />
         <h2 className="text-highlight" style={{ margin: 0 }}>
-          🛡️ Bảng Quản Trị Admin
+          🛡️ Admin Dashboard
         </h2>
       </div>
       
       <p className="text-muted" style={{ fontSize: '0.9em', marginBottom: 20 }}>
-        Dùng AdminCap để cấp quyền (DoctorCap) cho bác sĩ mới tham gia hệ thống.
+        Use AdminCap to grant DoctorCap to new doctors joining the system.
       </p>
 
-      {/* Hiển thị AdminCap ID hiện tại */}
+      {/* Show current AdminCap ID */}
       <div style={{ 
         background: 'rgba(59, 130, 246, 0.1)', 
         padding: '16px', 
@@ -86,7 +86,7 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <Shield size={16} />
-          <strong style={{ fontSize: '0.9em' }}>AdminCap ID (Của bạn):</strong>
+          <strong style={{ fontSize: '0.9em' }}>AdminCap ID (Your):</strong>
         </div>
         <p style={{ 
           fontFamily: 'monospace', 
@@ -101,26 +101,26 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         
-        {/* Input 1: Tên Bác Sĩ (Mới) */}
+        {/* Input 1: Doctor Display Name */}
         <div>
           <label className="text-muted" style={{ display: 'block', marginBottom: 8, fontSize: '0.95em' }}>
             <Stethoscope size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
-            Tên hiển thị của Bác sĩ
+            Doctor display name
           </label>
           <input 
             className="input-glass"
-            placeholder="Ví dụ: Dr. Strange" 
+            placeholder="e.g.: Dr. Strange" 
             value={doctorName}
             onChange={(e) => setDoctorName(e.target.value)}
             style={{ width: '100%' }}
           />
         </div>
 
-        {/* Input 2: Địa chỉ ví */}
+        {/* Input 2: Recipient Wallet Address */}
         <div>
           <label className="text-muted" style={{ display: 'block', marginBottom: 8, fontSize: '0.95em' }}>
             <UserPlus size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
-            Địa chỉ ví Sui (Recipient)
+            Sui wallet address (Recipient)
           </label>
           <input 
             className="input-glass"
@@ -149,12 +149,12 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
           {isMinting ? (
             <>
               <span className="spinner" style={{ display: 'inline-block', width: 16, height: 16 }}></span>
-              Đang xử lý...
+              Processing...
             </>
           ) : (
             <>
               <UserPlus size={18} />
-              Cấp Thẻ Bác Sĩ
+              Grant Doctor Cap
             </>
           )}
         </button>
@@ -171,11 +171,11 @@ export function AdminDashboard({ adminCapId }: { adminCapId: string }) {
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
           <Users size={18} style={{ marginTop: 2, flexShrink: 0 }} />
           <div>
-            <strong style={{ display: 'block', marginBottom: 6 }}>💡 Lưu ý:</strong>
+            <strong style={{ display: 'block', marginBottom: 6 }}>💡 Note:</strong>
             <ul style={{ margin: 0, paddingLeft: 20, color: 'var(--text-muted)' }}>
-              <li>DoctorCap mới sẽ được gửi thẳng vào ví của người nhận.</li>
-              <li>Tên bác sĩ sẽ được lưu vĩnh viễn trong DoctorCap đó.</li>
-              <li>Nếu bạn muốn tự test chức năng bác sĩ, hãy nhập địa chỉ ví của chính bạn.</li>
+              <li>The new DoctorCap will be sent directly to the recipient wallet.</li>
+              <li>The doctor name will be permanently stored in that DoctorCap.</li>
+              <li>If you want to test doctor features yourself, enter your own wallet address.</li>
             </ul>
           </div>
         </div>

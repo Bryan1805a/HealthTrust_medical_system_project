@@ -35,32 +35,32 @@ export function StatisticsDashboard() {
 
   const stats = [
     {
-      title: "Hồ sơ y tế",
+      title: "Medical Records",
       value: totalRecords,
       icon: FileText,
       color: "#3b82f6",
-      description: "Tổng số hồ sơ",
+      description: "Total records",
     },
     {
-      title: "Đơn thuốc",
+      title: "Prescriptions",
       value: totalPrescriptions,
       icon: Pill,
       color: "#10b981",
-      description: "Tổng số đơn",
+      description: "Total prescriptions",
     },
     {
-      title: "Đơn đang dùng",
+      title: "Active prescriptions",
       value: activePrescriptions,
       icon: Activity,
       color: "#f59e0b",
-      description: "Chưa sử dụng",
+      description: "Unused",
     },
     {
-      title: "Đơn đã dùng",
+      title: "Used prescriptions",
       value: usedPrescriptions,
       icon: Users,
       color: "#ef4444",
-      description: "Đã hoàn thành",
+      description: "Completed",
     },
   ];
 
@@ -69,8 +69,8 @@ export function StatisticsDashboard() {
   return (
     <div className="glass-card fade-in" style={{ marginBottom: 30 }}>
       <h2 className="text-highlight" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Activity size={24} /> Thống kê
-      </h2>
+        <Activity size={24} /> Statistics
+      </h2> 
       
       <div style={{ 
         display: 'grid', 
@@ -142,11 +142,11 @@ export function StatisticsDashboard() {
         })}
       </div>
 
-      {/* Progress bar cho đơn thuốc */}
+      {/* Progress bar for prescriptions */}
       {totalPrescriptions > 0 && (
         <div style={{ marginTop: 24, padding: '20px', background: 'rgba(0, 0, 0, 0.2)', borderRadius: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span className="text-muted">Tiến độ sử dụng đơn thuốc</span>
+            <span className="text-muted">Prescription usage progress</span>
             <span className="text-highlight" style={{ fontWeight: 600 }}>
               {Math.round((usedPrescriptions / totalPrescriptions) * 100)}%
             </span>

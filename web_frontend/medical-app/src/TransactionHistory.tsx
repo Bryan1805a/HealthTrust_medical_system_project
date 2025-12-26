@@ -5,7 +5,7 @@ import { Clock, ExternalLink, FileText, Pill, UserPlus, CheckCircle, Activity } 
 export function TransactionHistory() {
   const account = useCurrentAccount();
 
-  // Query transactions của user
+  // Query transactions of the user
   const { data: transactionsData, isLoading } = useSuiClientQuery(
     "queryTransactions",
     {
@@ -27,9 +27,9 @@ export function TransactionHistory() {
     return (
       <div className="glass-card fade-in">
         <h3 className="text-highlight" style={{ marginBottom: 20 }}>
-          📜 Lịch sử giao dịch
-        </h3>
-        <p className="text-muted">Đang tải...</p>
+          📜 Transaction History
+        </h3> 
+        <p className="text-muted">Loading...</p>
       </div>
     );
   }
@@ -38,11 +38,11 @@ export function TransactionHistory() {
     return (
       <div className="glass-card fade-in">
         <h3 className="text-highlight" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Clock size={20} /> Lịch sử giao dịch
-        </h3>
+          <Clock size={20} /> Transaction History
+        </h3> 
         <p className="text-muted" style={{ textAlign: 'center', padding: '20px' }}>
-          Chưa có giao dịch nào
-        </p>
+          No transactions yet
+        </p> 
       </div>
     );
   }
@@ -56,16 +56,16 @@ export function TransactionHistory() {
   };
 
   const getEventName = (type: string) => {
-    if (type.includes("PrescriptionCreated")) return "Tạo đơn thuốc";
-    if (type.includes("RecordCreated")) return "Tạo hồ sơ";
-    if (type.includes("PatientRegistered")) return "Đăng ký khám";
-    if (type.includes("PrescriptionUsed")) return "Sử dụng đơn thuốc";
-    return "Giao dịch";
+    if (type.includes("PrescriptionCreated")) return "Prescription Created";
+    if (type.includes("RecordCreated")) return "Record Created";
+    if (type.includes("PatientRegistered")) return "Patient Registered";
+    if (type.includes("PrescriptionUsed")) return "Prescription Used";
+    return "Transaction";
   };
 
   const formatDate = (timestamp: string | number) => {
     const date = new Date(Number(timestamp));
-    return date.toLocaleString('vi-VN', {
+    return date.toLocaleString('en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -77,7 +77,7 @@ export function TransactionHistory() {
   return (
     <div className="glass-card fade-in">
       <h3 className="text-highlight" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Clock size={20} /> Lịch sử giao dịch
+        <Clock size={20} /> Transaction History
       </h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -86,13 +86,13 @@ export function TransactionHistory() {
           const timestamp = tx.timestampMs || Date.now();
           const events = tx.events || [];
           
-          // Tìm events liên quan đến contract của chúng ta
+          // Find events related to our contract
           const relevantEvents = events.filter((event: any) => 
             event.type?.includes(PACKAGE_ID) || 
             event.type?.includes(MODULE_NAME)
           );
 
-          if (relevantEvents.length === 0 && index > 5) return null; // Chỉ hiện 5 tx đầu nếu không có events
+          if (relevantEvents.length === 0 && index > 5) return null; // Only show first 5 tx if there are no events
 
           return (
             <div
@@ -134,8 +134,8 @@ export function TransactionHistory() {
                   ) : (
                     <div>
                       <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                        Giao dịch blockchain
-                      </div>
+                        Blockchain transaction
+                      </div> 
                       <div className="text-muted" style={{ fontSize: '0.85em', fontFamily: 'monospace' }}>
                         {txDigest.slice(0, 16)}...
                       </div>
@@ -171,7 +171,7 @@ export function TransactionHistory() {
                     e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
                   }}
                 >
-                  Xem trên Explorer
+                  View on Explorer
                   <ExternalLink size={14} />
                 </a>
               </div>
@@ -182,8 +182,8 @@ export function TransactionHistory() {
 
       {transactionsData.data.length > 10 && (
         <p className="text-muted" style={{ textAlign: 'center', marginTop: 16, fontSize: '0.9em' }}>
-          Hiển thị 10 giao dịch gần nhất
-        </p>
+          Showing 10 most recent transactions
+        </p> 
       )}
     </div>
   );

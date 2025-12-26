@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSuiClientQuery, useCurrentAccount } from "@mysten/dapp-kit";
+import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { LOBBY_ID } from "./config";
 import { Users, Copy, CheckCircle, Activity, AlertTriangle, Stethoscope } from "lucide-react";
 import toast from "react-hot-toast";
@@ -11,9 +11,8 @@ type WaitingPatient = {
   priority: number | string;
 };
 
-// 👇 Cập nhật kiểu dữ liệu: nhận thêm index (number)
+// 👇 Update type: accept index (number) too
 export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address: string, index: number) => void }) {
-  const account = useCurrentAccount();
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   // Query Lobby object
@@ -27,15 +26,15 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
       },
     },
     {
-      enabled: !!LOBBY_ID && LOBBY_ID !== "YOUR_LOBBY_ID_HERE",
-      refetchInterval: 3000, // Tăng tốc độ refresh lên 3s để thấy thay đổi nhanh hơn
+      enabled: !!LOBBY_ID,
+      refetchInterval: 3000, // Increase refresh speed to 3s to see changes faster
     }
   );
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedAddress(text);
-    toast.success("Đã copy địa chỉ!");
+    toast.success("Address copied!");
     setTimeout(() => setCopiedAddress(null), 2000);
   };
 
@@ -46,39 +45,39 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
   const getPriorityBadge = (priority: number) => {
     if (priority >= 4) {
       return {
-        label: "Khẩn cấp",
+        label: "Urgent",
         color: "rgba(239,68,68,0.15)",
         borderColor: "#ef4444",
       };
     }
     if (priority === 3) {
       return {
-        label: "Ưu tiên",
+        label: "Priority",
         color: "rgba(234,179,8,0.1)",
         borderColor: "#eab308",
       };
     }
     return {
-      label: "Thường",
+      label: "Normal",
       color: "rgba(34,197,94,0.1)",
       borderColor: "#22c55e",
-    };
+    }; 
   };
 
-  if (!LOBBY_ID || LOBBY_ID === "YOUR_LOBBY_ID_HERE") {
+  if (!LOBBY_ID) {
     return (
       <div className="glass-card fade-in">
         <h3 className="text-highlight" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Users size={20} /> Sảnh chờ bệnh nhân
+          <Users size={20} /> Patient Lobby
         </h3>
         <p className="text-muted">
-          Chưa cấu hình LOBBY_ID. Vui lòng cập nhật trong config.ts
-        </p>
+          LOBBY_ID not configured. Please update in config.ts
+        </p> 
       </div>
     );
   }
 
-  const rawPatients = lobbyData?.data?.content?.fields?.patients || [];
+  const rawPatients = (lobbyData?.data as any)?.content?.fields?.patients || [];
   const patientsArray: WaitingPatient[] = Array.isArray(rawPatients)
     ? rawPatients.map((p: any) => {
         const fields = p?.fields ?? p?.data?.fields ?? p;
@@ -95,7 +94,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
     <div className="glass-card fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h3 className="text-highlight" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Users size={20} /> Sảnh chờ bệnh nhân
+          <Users size={20} /> Patient Lobby
         </h3>
         <div style={{
           background: 'rgba(59, 130, 246, 0.1)',
@@ -105,8 +104,8 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
           fontWeight: 600,
           color: 'var(--primary-light)',
         }}>
-          {patientsArray.length} đang chờ
-        </div>
+          {patientsArray.length} waiting
+        </div> 
       </div>
 
       {patientsArray.length === 0 ? (
@@ -114,7 +113,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
           <div style={{ background: 'rgba(255,255,255,0.05)', width: 60, height: 60, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <Users size={30} color="var(--text-muted)" style={{ opacity: 0.5 }} />
           </div>
-          <p className="text-muted" style={{ margin: 0 }}>Hiện tại không có bệnh nhân nào trong sảnh chờ.</p>
+          <p className="text-muted" style={{ margin: 0 }}>There are currently no patients in the waiting room.</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -163,7 +162,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ fontWeight: 600, fontSize: '1.05em' }}>
-                      Bệnh nhân #{index + 1}
+                      Patient #{index + 1}
                     </div>
                     <div
                       style={{
@@ -197,7 +196,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                         e.stopPropagation();
                         copyToClipboard(patient.addr);
                       }}
-                      title="Copy địa chỉ"
+                      title="Copy address"
                       style={{
                         background: 'transparent',
                         border: 'none',
@@ -219,27 +218,27 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
 
                   <div style={{ fontSize: '0.9em', color: 'var(--text-light)', marginTop: 4, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     <div>
-                      <span style={{color: 'var(--text-muted)'}}>Khoa: </span> 
+                      <span style={{color: 'var(--text-muted)'}}>Department: </span> 
                       <strong style={{color: 'var(--primary-light)'}}>{patient.department || "N/A"}</strong>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <Activity size={14} color="#f472b6" />
                       <span style={{color: 'var(--text-main)'}}>
-                        {patient.symptoms || "Chưa cung cấp"}
+                        {patient.symptoms || "Not provided"}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 👇 Nút này giờ sẽ gửi cả INDEX */}
+              {/* 👇 This button will now send the INDEX too */}
               <button
                 className="btn-primary"
                 onClick={() => onSelectPatient(patient.addr, index)} 
                 style={{ padding: '10px 20px', fontSize: '14px', borderRadius: '10px' }}
               >
                 <Stethoscope size={16} />
-                Khám ngay
+                Examine now
               </button>
             </div>
           );

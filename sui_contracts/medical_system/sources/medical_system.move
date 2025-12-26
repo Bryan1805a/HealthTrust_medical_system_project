@@ -7,11 +7,11 @@ module medical::core {
     use std::string::{String};
 
     // --- ERROR CODES ---
-    const EPatientNotFound: u64 = 1; // Lỗi không tìm thấy bệnh nhân để xóa
+    const EPatientNotFound: u64 = 1; // Cannot found patient error
 
     // --- CÁC STRUCT ---
 
-    /// Thẻ bác sĩ (Capability) - Thêm field name để lưu tên bác sĩ cố định
+    /// Doctor Capabillity - Thêm field name để lưu tên bác sĩ cố định
     struct DoctorCap has key, store { 
         id: UID,
         name: String 

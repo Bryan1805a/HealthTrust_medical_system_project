@@ -22,7 +22,7 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
   const handleSelectPatient = (address: string, index: number) => {
     setPatientId(address);
     setPatientIndex(index);
-    console.log(`Đã chọn bệnh nhân: ${address} tại vị trí: ${index}`);
+    console.log(`Selected patient: ${address} at index: ${index}`);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,28 +35,28 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
 
     if (hash) {
       setIpfsHash(hash);
-      toast.success("Đã upload ảnh thành công!");
+      toast.success("Image uploaded successfully!");
     } else {
-      toast.error("Upload thất bại.");
+      toast.error("Upload failed.");
     }
   };
 
   const createPrescription = () => {
-    // 👇 THAY ĐỔI 1: Bỏ check !ipfsHash trong điều kiện validate
+    // 👇 CHANGE 1: Remove check !ipfsHash from validate condition
     if (!account || !patientId || patientIndex === null || !prescriptionName || !diagnosis || !doctorName) {
-      toast.error("Vui lòng nhập đầy đủ các thông tin bắt buộc (*)");
+      toast.error("Please fill in all required fields (*)");
       return;
     }
 
     if (!PACKAGE_ID || !LOBBY_ID) {
-      toast.error("Chưa cấu hình ID trong config.ts");
+      toast.error("ID not configured in config.ts");
       return;
     }
 
     const txb = new Transaction();
     const nameBytes = new TextEncoder().encode(prescriptionName);
     
-    // 👇 THAY ĐỔI 2: Nếu không có ảnh, gửi chuỗi rỗng hoặc thông báo mặc định
+    // 👇 CHANGE 2: If no image, send empty string or default message
     const finalHash = ipfsHash || ""; 
     const ipfsBytes = new TextEncoder().encode(finalHash);
     
@@ -71,19 +71,19 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
         txb.object(LOBBY_ID),
         txb.pure.u64(patientIndex),
         txb.pure.vector("u8", nameBytes),
-        txb.pure.vector("u8", ipfsBytes), // Vẫn gửi bytes, nhưng là bytes rỗng nếu ko có ảnh
+        txb.pure.vector("u8", ipfsBytes), // Still send bytes; will be empty bytes if no image
         txb.pure.vector("u8", diagnosisBytes),
         txb.pure.u64(timestampSeconds),
       ],
     });
 
-    const loadingToast = toast.loading("Đang ký đơn thuốc & Xóa khỏi hàng chờ...");
+    const loadingToast = toast.loading("Signing prescription & removing from queue...");
 
     signAndExecuteTransaction(
       { transaction: txb },
       {
         onSuccess: () => {
-          toast.success("Đã gửi đơn thuốc thành công!", { id: loadingToast });
+          toast.success("Prescription sent successfully!", { id: loadingToast });
           // Reset form
           setPrescriptionName("");
           setDiagnosis("");
@@ -92,7 +92,7 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
           setPatientIndex(null);
           setIpfsHash(""); 
         },
-        onError: (err) => toast.error("Lỗi: " + err.message, { id: loadingToast }),
+        onError: (err) => toast.error("Error: " + err.message, { id: loadingToast }),
       }
     );
   };
@@ -105,7 +105,7 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
 
       <div className="glass-card" style={{ maxWidth: 600, margin: '0 auto', width: '100%' }}>
         <h2 className="text-highlight" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          👨‍⚕️ Bàn làm việc Bác sĩ
+          👨‍⚕️ Doctor Dashboard
         </h2>
         <p className="text-muted" style={{ fontSize: '0.8em', marginBottom: 20 }}>
           ID: {doctorCapId}
@@ -114,48 +114,48 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
         
         <div>
-          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Mã ví bệnh nhân <span style={{color: 'red'}}>*</span></label>
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Patient wallet ID <span style={{color: 'red'}}>*</span></label>
           <input 
             className="input-glass"
             value={patientId}
             readOnly 
-            placeholder="Chọn bệnh nhân từ danh sách trên..."
+            placeholder="Select patient from the list above..."
           />
         </div>
         
         <div>
-          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Tên đơn thuốc <span style={{color: 'red'}}>*</span></label>
-          <input className="input-glass" placeholder="VD: Đơn thuốc cảm cúm..." value={prescriptionName} onChange={(e) => setPrescriptionName(e.target.value)} />
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Prescription name <span style={{color: 'red'}}>*</span></label>
+          <input className="input-glass" placeholder="e.g., Flu prescription..." value={prescriptionName} onChange={(e) => setPrescriptionName(e.target.value)} />
         </div>
 
         <div>
-          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Chẩn đoán <span style={{color: 'red'}}>*</span></label>
-          <textarea className="input-glass" rows={2} placeholder="Chẩn đoán bệnh..." value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} />
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Diagnosis <span style={{color: 'red'}}>*</span></label>
+          <textarea className="input-glass" rows={2} placeholder="Diagnosis..." value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} />
         </div>
 
         <div>
-          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Tên bác sĩ <span style={{color: 'red'}}>*</span></label>
-          <input className="input-glass" placeholder="BS. Nguyễn Văn A" value={doctorName} onChange={(e) => setDoctorName(e.target.value)} />
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Doctor name <span style={{color: 'red'}}>*</span></label>
+          <input className="input-glass" placeholder="Dr. John Doe" value={doctorName} onChange={(e) => setDoctorName(e.target.value)} />
         </div>
 
         <div style={{ padding: 15, background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--glass-border)', borderRadius: 8 }}>
-            {/* 👇 THAY ĐỔI 3: Thêm chữ Tùy chọn */}
+            {/* 👇 CHANGE 3: Add 'Optional' label */}
             <label style={{ display: "block", marginBottom: 10, fontWeight: "bold", fontSize: '0.9em' }}>
-                📎 Đính kèm X-Quang / Đơn thuốc (Tùy chọn)
+                📎 Attach X-ray / Prescription (Optional)
             </label>
             <input type="file" onChange={handleFileChange} disabled={isUploading} style={{ color: 'white' }} />
-            {isUploading && <p style={{ color: "#fbbf24", margin: "10px 0 0" }}>⏳ Đang tải lên IPFS...</p>}
-            {ipfsHash && <p style={{ color: "#4ade80", fontSize: "0.8em", margin: "10px 0 0" }}>✅ Upload xong: {ipfsHash.slice(0, 20)}...</p>}
+            {isUploading && <p style={{ color: "#fbbf24", margin: "10px 0 0" }}>⏳ Uploading to IPFS...</p>}
+            {ipfsHash && <p style={{ color: "#4ade80", fontSize: "0.8em", margin: "10px 0 0" }}>✅ Upload complete: {ipfsHash.slice(0, 20)}...</p> }
         </div>
 
         <button 
           className="btn-primary"
           onClick={createPrescription}
-          // 👇 THAY ĐỔI 4: Bỏ điều kiện !ipfsHash trong disabled
+          // 👇 CHANGE: Removed !ipfsHash from disabled
           disabled={isUploading || !patientId || !prescriptionName || !diagnosis}
           style={{ marginTop: 10, padding: 15 }}
         >
-          ✍️ Ký & Gửi Đơn Thuốc
+          ✍️ Sign & Send Prescription
         </button>
         </div>
       </div>

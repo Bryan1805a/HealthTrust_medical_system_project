@@ -15,9 +15,9 @@ import { AdminDashboard } from "./AdminDashboard";
 
 function App() {
   const account = useCurrentAccount();
-  const [activeTab, setActiveTab] = useState("patient"); // Tab mặc định
+  const [activeTab, setActiveTab] = useState("patient"); // Default tab
 
-  // Query 1: Check Bệnh nhân
+  // Query 1: Check Patient
   const { data: patientData, refetch: refetchPatient } = useSuiClientQuery(
     "getOwnedObjects",
     {
@@ -27,7 +27,7 @@ function App() {
     { enabled: !!account }
   );
 
-  // Query 2: Check Bác sĩ
+  // Query 2: Check Doctor
   const { data: doctorData } = useSuiClientQuery(
     "getOwnedObjects",
     {
@@ -51,14 +51,14 @@ function App() {
   const doctorCap = doctorData?.data?.[0];
   const adminCap = adminData?.data?.[0];
 
-  // Tự động chuyển sang tab Bác sĩ nếu phát hiện có DoctorCap (nhưng không override Admin)
+  // Automatically switch to Doctor tab if DoctorCap is detected (but don't override Admin)
   useEffect(() => {
     if (doctorCap && !adminCap) setActiveTab("doctor");
   }, [doctorCap, adminCap]);
 
   return (
     <div className="container" style={{ paddingTop: 30, paddingBottom: 100 }}>
-      {/* 1. CẤU HÌNH TOASTER (Thông báo bay ra ở góc trên phải) */}
+      {/* 1. TOASTER CONFIG (Notifications appear top-right) */}
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -103,24 +103,24 @@ function App() {
             maxWidth: 600,
             margin: "0 auto"
           }}>
-            <h2 style={{ marginBottom: 16 }}>👋 Chào mừng đến với hệ thống Y tế HealthTrust</h2>
+            <h2 style={{ marginBottom: 16 }}>👋 Welcome to the Nova Medical System</h2>
             <p className="text-muted" style={{ fontSize: '1.1em', marginBottom: 0 }}>
-              Vui lòng kết nối ví Sui để tiếp tục
+              Please connect a Sui wallet to continue
             </p>
           </div>
         ) : PACKAGE_ID === "YOUR_PACKAGE_ID_HERE" ? (
           <div className="fade-in">
             <div className="glass-card" style={{ maxWidth: 800, margin: '0 auto', marginBottom: 30 }}>
-              <h2 style={{ marginBottom: 16, color: '#f59e0b' }}>⚠️ Cần cấu hình Contract IDs</h2>
+              <h2 style={{ marginBottom: 16, color: '#f59e0b' }}>⚠️ Contract IDs configuration required</h2>
               <p className="text-muted" style={{ marginBottom: 20 }}>
-                Bạn đã publish contract thành công! Bây giờ cần cập nhật PACKAGE_ID và LOBBY_ID trong config.ts
+                You have successfully published the contract! Now update PACKAGE_ID and LOBBY_ID in config.ts
               </p>
               <FindContractIds />
             </div>
           </div>
         ) : (
           <div className="fade-in">
-            {/* 2. MENU TAB CHUYỂN ĐỔI - Tab navigation */}
+            {/* 2. TAB MENU - Tab navigation */}
             <div style={{ 
               display: 'flex', 
               gap: 12, 
@@ -131,34 +131,34 @@ function App() {
                 onClick={() => setActiveTab('patient')}
                 className={`tab-button ${activeTab === 'patient' ? 'active' : ''}`}
               >
-                <User size={18} /> Cổng Bệnh Nhân
+                <User size={18} /> Patient Portal
               </button>
 
-              {/* Chỉ hiện tab Bác sĩ nếu có quyền */}
+              {/* Show doctor tab only if authorized */}
               {doctorCap && (
                  <button 
                    onClick={() => setActiveTab('doctor')}
                    className={`tab-button ${activeTab === 'doctor' ? 'active' : ''}`}
                  >
-                   <Stethoscope size={18} /> Cổng Bác Sĩ
+                   <Stethoscope size={18} /> Doctor Portal
                  </button>
               )}
 
-              {/* Chỉ hiện tab Admin nếu có AdminCap */}
+              {/* Show admin tab only if AdminCap exists */}
               {adminCap && (
                  <button 
                    onClick={() => setActiveTab('admin')}
                    className={`tab-button ${activeTab === 'admin' ? 'active' : ''}`}
                  >
-                   <Shield size={18} /> Cổng Admin
+                   <Shield size={18} /> Admin Portal
                  </button>
               )}
             </div>
 
-            {/* 3. NỘI DUNG CHÍNH (Thay đổi theo Tab) */}
+            {/* 3. MAIN CONTENT (Changes per Tab) */}
             <div className="glass-card" style={{ minHeight: 500, padding: 40 }}>
               
-              {/* === TAB BỆNH NHÂN === */}
+              {/* === PATIENT TAB === */}
               {activeTab === 'patient' && (
                 <div className="fade-in">
                   {patientRecord ? (
@@ -192,14 +192,14 @@ function App() {
                 </div>
               )}
 
-              {/* === TAB BÁC SĨ === */}
+              {/* === DOCTOR TAB === */}
               {activeTab === 'doctor' && doctorCap && (
                 <div className="fade-in">
                   <DoctorDashboard doctorCapId={doctorCap.data?.objectId!} />
                 </div>
               )}
 
-              {/* === TAB ADMIN === */}
+              {/* === ADMIN TAB === */}
               {activeTab === 'admin' && adminCap && (
                 <div className="fade-in">
                   <AdminDashboard adminCapId={adminCap.data?.objectId!} />
